@@ -1,0 +1,161 @@
+Space Ivaders
+================
+Librerias
+================
+
+#include <stdio.h>
+#include <time.h>
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_image.h>
+#include "variables.h"
+
+
+-----------------------------------
+Definicion de funciones y variables
+===================================
+
+#define ANCHO 80  
+#define ALTO 50
+$ tamanio del tablero
+
+
+-----------------------------
+$ cargar imagenes al programa
+-----------------------------
+bitmap * naves;
+BITMAP *load_bitmap(const char *space1, RGB *pal);
+
+
+=========================
+Funciones
+=========================
+
+int tablero [ANCHO][ALTO];
+
+typedef struct
+{
+	int vidas;
+	int puntos;
+    ALLEGRO_BITMAP * dibujo; //imagen jugador 
+	char * nombre;
+	int x;
+	int y;
+}JUGADOR;
+
+typedef struct
+{
+	int x;   //dimensiones enemigo
+	int y;
+}ENEMIGO;
+
+typedef struct
+{
+	int x;
+	int y;
+}NAVE_ESPECIAL;   //Nave con mayor puntaje
+
+typedef struct
+{
+	int x;
+	int y;   
+}MURO;
+
+void perderVida (JUGADOR * muerte){
+	muerte->vidas--;
+}
+
+void sumarPuntos(int puntos, int * puntos_jugador){
+	(*puntos_jugador) += puntos;
+}
+
+JUGADOR ingresarJugador(){
+	JUGADOR jugador1;
+	jugador1.nombre=malloc(sizeof(char)*30);
+	jugador1.vidas=3;
+	jugador1.puntos=0;
+	jugador1.x=39;
+	jugador1.y=55;
+	jugador1.nombre="Player One";
+    ALLEGRO_PATH * path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+    al_change_directory(al_path_cstr(path, '/'));
+    al_destroy_path(path);
+    jugador1.dibujo = al_load_bitmap("../img/marco.png");
+    if(!jugador1.dibujo) printf("Error fatal");
+
+	return jugador1;
+}
+
+void dibujarJugador(JUGADOR * jugador){
+	tablero[(*jugador).x][jugador->y]= 1 ;
+}
+
+void dibujarTablero(){
+	int i, j;
+	system("cls");
+	for (i = 0 ; i < ANCHO + 2; i++)
+		printf("-");
+	
+	printf("\n");
+	
+	for (i = 0 ; i < ANCHO; i++){
+		printf("|");
+		for (j = 0; i < ALTO; j++)
+			if (tablero[i][j] == 0)
+				printf(" ");
+			else
+				printf("%c", tablero[i][j] );
+        printf("|\n");
+	}
+	for(i=0;i<ANCHO+2;i++)
+		printf("-");
+    
+}
+
+ENEMIGO crearEnemigo()
+{
+	ENEMIGO enemigo1;
+	enemigo1.x=5;
+	enemigo1.y=11;
+    return enemigo1;
+}
+
+void dibujarEnemigo(ENEMIGO * enemigo1){
+	tablero[enemigo1->x][enemigo1->y]=1;
+}
+
+void moverJugador(JUGADOR * jugador, char movimiento){
+	tablero[jugador->x][jugador->y]=0;
+	switch(movimiento){
+		case 'a':
+			if(jugador->y>0)
+				jugador->y--;
+			break;
+		case 'd':
+			if(jugador->y<ALTO-1)
+				jugador->y++;
+			break;
+            
+	}
+}
+
+MURO crearMuro(){
+	MURO muro1;
+	muro1.x=5;
+	muro1.y=45;
+    return muro1;
+}
+
+void dibujarMuro(MURO * muro1){
+	tablero[muro1->x][muro1->y]=3;
+}
+
+
+NAVE_ESPECIAL crearNave(){
+	NAVE_ESPECIAL nave1;
+	nave1.x=79;
+	nave1.y=2;
+    return nave1;
+}
+void dibujarNave(NAVE_ESPECIAL * nave1){
+	tablero[nave1->x][nave1->y]=1;
+}
